@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import GlobalStyles from './components/GlobalStyles';
 import FloatingEmojis from './components/FloatingEmojis';
 import EmotionApp from './components/EmotionApp';
 import LoginPage from './components/auth/LoginPage';
@@ -127,8 +126,6 @@ function App() {
 
   return (
     <div>
-      <GlobalStyles />
-      {user && <FloatingEmojis />}   
       <div className="app">{renderContent()}</div>
     </div>
   );

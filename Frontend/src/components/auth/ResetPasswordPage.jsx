@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './ResetPasswordPage.css';
 
 export default function ResetPasswordPage({ onResetSubmit, onSwitchToLogin, error, info, isLoading }) {
   const [newPassword, setNewPassword] = useState('');
@@ -19,31 +20,87 @@ export default function ResetPasswordPage({ onResetSubmit, onSwitchToLogin, erro
     onResetSubmit(newPassword);
   };
 
+  const displayError = error || localError;
+
   return (
-    <>
-      <div className="login-background"></div>
-      <div className="auth-container">
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <h2>Set New Password</h2>
-          <p>Please enter your new password.</p>
+    <div className="reset-password-page">
+      <div className="reset-password-card">
+        <h1 className="reset-password-title">
+          Set New Password
+        </h1>
+        <p className="reset-password-subtitle">
+          Please enter your new password to secure your account
+        </p>
+        
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="new-password">New Password</label>
-            <input id="new-password" type="password" value={newPassword} onChange={(e)=>setNewPassword(e.target.value)} placeholder="Enter new password" />
+            <input
+              id="new-password"
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className={isLoading ? 'loading' : ''}
+              disabled={isLoading}
+              required
+              autoComplete="new-password"
+              aria-label="Enter new password"
+              minLength="6"
+            />
           </div>
+          
           <div className="input-group">
-            <label htmlFor="confirm-password">Confirm New Password</label>
-            <input id="confirm-password" type="password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} placeholder="Confirm new password" />
+            <input
+              id="confirm-password"
+              type="password"
+              placeholder="Confirm New Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={isLoading ? 'loading' : ''}
+              disabled={isLoading}
+              required
+              autoComplete="new-password"
+              aria-label="Confirm new password"
+              minLength="6"
+            />
           </div>
-          <div className="error-message">{error || localError}</div>
-          <div className="info-message">{info}</div>
-          <button type="submit" className="auth-button" disabled={isLoading}>
-            {isLoading ? <div className="button-loader-container"><div className="loader" /><span>Resetting...</span></div> : 'Set New Password'}
+          
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            aria-label={isLoading ? 'Setting new password...' : 'Set new password'}
+          >
+            <span>
+              {isLoading ? 'Setting Password...' : 'Set New Password'}
+            </span>
           </button>
-          <p className="form-switcher">
-            <span onClick={onSwitchToLogin}>Back to Login</span>
-          </p>
+          
+          {displayError && (
+            <p className="error" role="alert">
+              {displayError}
+            </p>
+          )}
+          
+          {info && (
+            <p className="info" role="status">
+              {info}
+            </p>
+          )}
         </form>
+        
+        <div className="login-links">
+          <p className="login-text">
+            Remember your password?
+          </p>
+          <button 
+            onClick={onSwitchToLogin}
+            type="button"
+            aria-label="Go back to login page"
+          >
+            Back to Login
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

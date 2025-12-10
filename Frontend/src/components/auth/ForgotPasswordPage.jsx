@@ -1,39 +1,117 @@
 import React, { useState } from 'react';
+import './ForgotPasswordPage.css';
 
-
-export default function ForgotPasswordPage({ onResetRequest, onSwitchToLogin, error, info, isLoading }) {
+const ForgotPasswordPage = ({ onResetRequest, onSwitchToLogin, onSwitchToRegister, error, info, isLoading }) => {
   const [username, setUsername] = useState('');
+  const [localError, setLocalError] = useState('');
+  const [localMessage, setLocalMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username) {
-      onResetRequest("");
+    setLocalError('');
+    setLocalMessage('');
+    
+    if (!username.trim()) {
+      setLocalError('Please enter your username or email address');
       return;
     }
-    onResetRequest(username);
+
+    if (onResetRequest) {
+      onResetRequest(username);
+    } else {
+      // Fallback for standalone usage
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setLocalMessage('If an account with that username exists, you will receive a password reset email shortly.');
+        setUsername('');
+      } catch (error) {
+        setLocalError('An error occurred. Please try again later.');
+      }
+    }
   };
 
+  const displayError = error || localError;
+  const displayMessage = info || localMessage;
+
   return (
-    <>
-      <div className="login-background"></div>
-      <div className="auth-container">
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <h2>Forgot Password</h2>
-          <p>Enter your username to request a reset token.</p>
+    <div className="forgot-password-page">
+      <div className="forgot-password-card">
+        <h1 className="forgot-password-title">
+          Reset Password
+        </h1>
+        <p className="forgot-password-subtitle">
+          Enter your username or email address and we'll send you a link to reset your password
+        </p>
+        
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="reset-username">Username</label>
-            <input id="reset-username" type="text" value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Enter your username" />
+            <input
+              id="reset-username"
+              type="text"
+              placeholder="Username or Email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={isLoading ? 'loading' : ''}
+              disabled={isLoading}
+              required
+              autoComplete="username email"
+              aria-label="Username or Email Address"
+            />
           </div>
-          <div className="error-message">{error}</div>
-          <div className="info-message">{info}</div>
-          <button type="submit" className="auth-button" disabled={isLoading}>
-            {isLoading ? <div className="button-loader-container"><div className="loader" /><span>Requesting...</span></div> : 'Request Reset Token'}
+          
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            aria-label={isLoading ? 'Sending reset link...' : 'Send reset link'}
+          >
+            <span>
+              {isLoading ? 'Requesting...' : 'Send Reset Link'}
+            </span>
           </button>
-          <p className="form-switcher">
-            Remembered your password? <span onClick={onSwitchToLogin}>Login here</span>
-          </p>
+          
+          {displayError && (
+            <p className="error" role="alert">
+              {displayError}
+            </p>
+          )}
+          
+          {displayMessage && (
+            <p className="info" role="alert">
+              {displayMessage}
+            </p>
+          )}
         </form>
+        
+        <div className="login-links">
+          <p className="login-text">
+            Remember your password?
+          </p>
+          <button 
+            onClick={onSwitchToLogin}
+            type="button"
+            aria-label="Go back to login page"
+          >
+            Sign In
+          </button>
+        </div>
+        
+        {onSwitchToRegister && (
+          <div className="login-links">
+            <p className="login-text">
+              Don't have an account?
+            </p>
+            <button 
+              onClick={onSwitchToRegister}
+              type="button"
+              aria-label="Go to registration page"
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
-}
+};
+
+export default ForgotPasswordPage;
